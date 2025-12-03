@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#goals 
+#Automate data retrival fo multiple pokemons
+#Create a script looping through pokemon list
+#Retreive data for eachand save it in a file named after the pokemon
+# Handle rate limiting 
+
+
+# List of Pokémon to retrieve
+pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+
+# Loop over each Pokémon
+for pokemon in "${pokemon_list[@]}"; do
+    # Convert name to lowercase for API
+    name_lower=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
+    
+    # Make API request and save to <pokemon>.json
+    curl -s "https://pokeapi.co/api/v2/pokemon/$name_lower" -o "${name_lower}.json"
+    
+    # Check if request succeeded
+    if [ $? -ne 0 ]; then
+        echo "Error fetching $pokemon at $(date)" >> errors.txt
+    else
+        echo "Saved $pokemon data to ${name_lower}.json"
+    fi
+
+    # Delay 1 second between requests to avoid rate limiting
+    sleep 1
+done
