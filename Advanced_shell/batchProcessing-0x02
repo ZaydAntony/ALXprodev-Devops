@@ -8,7 +8,7 @@
 
 
 # List of Pokémon to retrieve
-pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+pokemon_list=[ "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon" ]
 
 # Loop over each Pokémon
 for pokemon in "${pokemon_list[@]}"; do

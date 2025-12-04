@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#Goal is to create a summarry of all the pokemons data into a csv file
+
+output="pokemon_report.csv"
+
+#csv files headers
+echo "name,height,weight" > "$output"
+
+#looping through json files
+
+for file in *.json; do
+    name=$(jq -r '.name' "$file")
+    height=$(jq -r '.height' "$file")
+    weight=$(jq -r '.weight' "$file")
+
+    echo "$name,$height,$weight" >> "$output"
+done
+
+#calculate average height and weight
+
+echo "----Average-----"
+
+awk -F',' 'NR>1 {total_height+=$2; total_weight+=$3; count++}
+END{
+    print "Average Height}:", total_height/count
+    print "Average Weight}:", total_weight/count
+}' "$output"
