@@ -1,0 +1,33 @@
+#!/bin/bash
+#Goal parallel processing and bg tasks
+
+#!/bin/bash
+# batchProcessing-0x04 - Parallel Pokémon Data Retrieval
+
+pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+
+# Function to fetch a single Pokémon
+fetch_pokemon() {
+    name="$1"
+    name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
+
+    curl -s "https://pokeapi.co/api/v2/pokemon/$name_lower" -o "${name_lower}.json"
+
+    if [ $? -eq 0 ]; then
+        echo "Fetched $name successfully."
+    else
+        echo "Failed to fetch $name at $(date)" >> errors.txt
+    fi
+}
+
+echo "Starting parallel Pokémon fetch..."
+
+# Loop and run all fetches in parallel
+for pokemon in "${pokemon_list[@]}"; do
+    fetch_pokemon "$pokemon" &
+done
+
+# Wait for ALL background jobs to finish
+wait
+
+echo "All parallel downloads completed."
