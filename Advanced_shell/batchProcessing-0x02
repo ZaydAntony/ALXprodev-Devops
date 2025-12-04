@@ -8,23 +8,37 @@
 
 
 # List of Pokémon to retrieve
-pokemon_list=[ "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon" ]
+pokemon_list=("Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon")
 
 # Loop over each Pokémon
 for pokemon in "${pokemon_list[@]}"; do
     # Convert name to lowercase for API
     name_lower=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
+
+    #retry variables
+    attempts=0
+    success=false
     
-    # Make API request and save to <pokemon>.json
-    curl -s "https://pokeapi.co/api/v2/pokemon/$name_lower" -o "${name_lower}.json"
-    
-    # Check if request succeeded
-    if [ $? -ne 0 ]; then
-        echo "Error fetching $pokemon at $(date)" >> errors.txt
-    else
-        echo "Saved $pokemon data to ${name_lower}.json"
+    while [ $attempts -lt 3 ]; do
+        # Make API request
+        curl -s "https://pokeapi.co/api/v2/pokemon/$name_lower" -o "${name_lower}.json"
+
+        # Check if curl succeeded
+        if [ $? -eq 0 ]; then
+            echo "Fetched $pokemon successfully."
+            success=true
+            break
+        else
+            echo "Attempt $((attempts+1)) for $pokemon failed."
+            attempts=$((attempts+1))
+            sleep 1
+        fi
+    done
+
+    # If all retries failed, log error
+    if [ "$success" = false ]; then
+        echo "Failed to fetch $pokemon after 3 attempts at $(date)" >> errors.txt
+        echo "Skipping $pokemon..."
     fi
 
-    # Delay 1 second between requests to avoid rate limiting
-    sleep 1
 done

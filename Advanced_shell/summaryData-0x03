@@ -14,6 +14,9 @@ for file in *.json; do
     height=$(jq -r '.height' "$file")
     weight=$(jq -r '.weight' "$file")
 
+    # Use sed to capitalize the first letter 
+    name=$(echo "$name" | sed 's/.*/\u&/')
+
     echo "$name,$height,$weight" >> "$output"
 done
 
